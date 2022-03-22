@@ -1,0 +1,10 @@
+We won't make you implement any tests for this challenge, 
+but we still want to see how you think about testing your code. 
+
+If you WERE to implement tests for your function, what cases would you test?
+
+List each case below in plain english with it's expected result. 
+
+For example...
+Case: user a views user b's recording x for the first time
+Expected Result: user b's views and recording x's views are incremented by 1
