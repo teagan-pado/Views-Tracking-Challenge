@@ -7,4 +7,4 @@ List each case below in plain english with it's expected result.
 
 For example...
 Case: user a views user b's recording x for the first time
-Expected Result: user b's views and recording x's views are incremented by 1
+Expected Result: etc etc

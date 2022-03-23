@@ -23,7 +23,7 @@ export enum Collections {
     Recordings = "Recordings"
 }
 
-export async function trackRecordingView(viewerId: string, recordingId: string) {
+export async function trackRecordingView(viewerId: string, recordingId: string): Promise<void> {
   // TODO: implement this function
 
   // logs can be viewed in the firebase emulator ui

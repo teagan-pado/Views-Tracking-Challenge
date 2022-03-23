@@ -14,7 +14,12 @@ cd functions && npm i
 ```
 
 ### Writing Your Code:
-The main place you'll want to write your code is inside. 
+- The main place you'll want to write your code is in functions/src/track-recording-view.ts
+- Here you'll find a function stub you can use with some examples of how to interact with the firebase database
+- Implement the function trackRecordingView
+
+### Writing Test Cases For Your Code:
+- No need to write full unit tests for your code, but inside functions/test/test.txt, list the test cases you'd test if you were to write thorough unit testing, and the expected result in each case
 
 ### Running Your Code:
 Firebase has some excellent tooling for locally emulating cloud functions, firestore database, and more in concert. We've set up database with some dummy data for you to play around with, and a website you can use to easily hit your locally running cloud function. Here's how to use it
@@ -24,8 +29,7 @@ npm run serve
 ```
 - once your emulator is running, you can can easily access the firestore database and your function logs through the firebase emulator ui at http://localhost:4000. You should see some dummy data in the database when on startup
 - use https://sirocodingchallenges.web.app to easily make requests to your function running locally
-- NOTE: we don't have hot reloading setup for this project yet, so you'll have to terminate the emulator and restart with 
+- NOTE: we don't have hot reloading setup for this project yet, so you'll have to terminate the emulator and restart whenever you make code changes with 
 ```
 npm run serve
 ```
-whenever you make code changes
