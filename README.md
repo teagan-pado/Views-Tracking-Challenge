@@ -1,7 +1,7 @@
 # Views-Tracking-Challenge
 
 ### Prerequisites:
-- Node
+- Node, if you don't have it, you can install it from https://nodejs.org/en/download/
 
 ### Getting Started:
 - install the firebase CLI with
@@ -13,10 +13,19 @@ npm install -g firebase-tools
 cd functions && npm i
 ```
 
-### Emulating Your Cloud Function Locally
+### Writing Your Code:
+The main place you'll want to write your code is inside. 
+
+### Running Your Code:
+Firebase has some excellent tooling for locally emulating cloud functions, firestore database, and more in concert. We've set up database with some dummy data for you to play around with, and a website you can use to easily hit your locally running cloud function. Here's how to use it
 - initiate the emulator from the functions directory with
 ```
 npm run serve
 ```
-- access the firestore database and your function logs (http://localhost:4000, "here")
-- easily make requests to your cloud function (https://sirocodingchallenges.web.app "here")
+- once your emulator is running, you can can easily access the firestore database and your function logs through the firebase emulator ui at http://localhost:4000. You should see some dummy data in the database when on startup
+- use https://sirocodingchallenges.web.app to easily make requests to your function running locally
+- NOTE: we don't have hot reloading setup for this project yet, so you'll have to terminate the emulator and restart with 
+```
+npm run serve
+```
+whenever you make code changes
