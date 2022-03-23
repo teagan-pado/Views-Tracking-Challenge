@@ -27,7 +27,7 @@ Firebase has some excellent tooling for locally emulating cloud functions, fires
 ```
 npm run serve
 ```
-- once your emulator is running, you can can easily access the firestore database and your function logs through the firebase emulator ui at http://localhost:4000. You should see some dummy data in the database when on startup
+- once your emulator is running, you can can easily access the firestore database and your function logs through the firebase emulator ui at http://localhost:4000. You should see some dummy data in the database
 - use https://sirocodingchallenges.web.app to easily make requests to your function running locally
 - NOTE: we don't have hot reloading setup for this project yet, so you'll have to terminate the emulator and restart whenever you make code changes with 
 ```
