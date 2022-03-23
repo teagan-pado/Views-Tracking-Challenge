@@ -1,13 +1,11 @@
 import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+import {db} from "./index";
 
 /* BONUS OPPORTUNITY
 It's not great (it's bad) to throw all of this code in one file.
 Can you help us organize this code better?
 */
 
-// use db to access the database
-const db = admin.firestore();
 
 export interface Recording {
     id: string; // matches document id in firestore

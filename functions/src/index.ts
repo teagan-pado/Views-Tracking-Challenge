@@ -10,6 +10,11 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
   projectId: "sirocodingchallenges",
 });
+
+// use db to access the database
+export const db = admin.firestore();
+
+
 // If you need, here's the documentation for google cloud functions w typescript:
 // https://firebase.google.com/docs/functions/typescript
 
