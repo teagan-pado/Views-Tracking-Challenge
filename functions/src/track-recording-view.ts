@@ -42,14 +42,20 @@ export async function trackRecordingView(viewerId: string, recordingId: string):
     functions.logger.debug("it didn't exist");
   }
 
-
-  // write to a document using set or update
-  // set overwrites existing data and creates new documents if necessary
+  // overwrite a document based on the data you have when sending the write request
+  // set overwrites all existing fields and creates new documents if necessary
   await db.collection("collection").doc("doc").set({id: "id", field: "foo"});
   // update will fail if the document exists and will only update fields included
   // in your update
-  await db.collection("collection").doc("doc").set({id: "id", field: "bar"});
+  await db.collection("collection").doc("doc").update({id: "id", field: "bar"});
 
-  // read more about transactions, batch writes etc here:
+  // update based on data inside the document at the time of the write using a transaction
   // https://firebase.google.com/docs/firestore/manage-data/transactions#web-version-9
+
+  await db.runTransaction(async (t): Promise<void> => {
+    const ref = db.collection("collection").doc("doc");
+    const docSnapshot = await t.get(ref);
+    // do something with the data
+    t.set(ref, {id: "id", field: "foobar"});
+  });
 }
