@@ -1,61 +1,75 @@
+import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {db} from "./index";
 
-/* BONUS OPPORTUNITY
-It's not great (it's bad) to throw all of this code in one file.
-Can you help us organize this code better?
-*/
-
-
-export interface Recording {
-    id: string; // matches document id in firestore
-    creatorId: string; // id of the user that created this recording
-    uniqueViewCount: number;
-}
-
-export interface User {
-    id: string; // mathes both the user's document id
-    uniqueRecordingViewCount: number; // sum of all recording views
-}
-
-export enum Collections {
-    Users = "Users",
-    Recordings = "Recordings"
-}
+// Moved all of the defined types to a types.js file for future consumption 
 
 export async function trackRecordingView(viewerId: string, recordingId: string): Promise<void> {
-  // TODO: implement this function
 
-  // logs can be viewed in the firebase emulator ui
-  functions.logger.debug("viewerId: ", viewerId);
-  functions.logger.debug("recordingId: ", recordingId);
+  // Get Both Collections
+    const getUserRef = await db.collection("Users").doc(viewerId).get();
+    const getRecordingRef = await db.collection("Recordings").doc(recordingId).get();
 
+    try{
+          // First check to make sure we are dealing with valid inputs
+            if(getUserRef.exists && getRecordingRef.exists) {
 
-  // ATTN: the rest of the code in this file is only here to show how firebase works
+              // We want to transactionally check and update the count for both collections/documents
+              await db.runTransaction(async (t): Promise<void> => {
+                // Get all recordings with the input recordingId => is unique
+                const recordingRefSnap: admin.firestore.Query = db.collection("Recordings")
+                    .where("id", "==", recordingId);
 
-  // read from a document
-  const documentSnapshot = await db.collection("collection").doc("doc").get();
-  if (documentSnapshot.exists) {
-    const data = documentSnapshot.data();
-    functions.logger.debug("it did exist!", data);
-  } else {
-    functions.logger.debug("it didn't exist");
-  }
+                // Get all users with the input viewerId => is unique
+                const userRefSnap: admin.firestore.Query = db.collection("Users")
+                    .where("id", "==", viewerId);
+                
+                // Get all Documents from the previous query where there is an array with 
+                // the input recordingId
+                const recordingRef: admin.firestore.QuerySnapshot = await t.get(userRefSnap
+                    .where("recordingsViewed", "array-contains", recordingId));
 
-  // overwrite a document based on the data you have when sending the write request
-  // set overwrites all existing fields and creates new documents if necessary
-  await db.collection("collection").doc("doc").set({id: "id", field: "foo"});
-  // update will fail if the document exists and will only update fields included
-  // in your update
-  await db.collection("collection").doc("doc").update({id: "id", field: "bar"});
+                // When there are no recordings in our pair, continue
+                if (recordingRef.size == 0){
+                  functions.logger.debug("We do not have a record of this recording and this user")
 
-  // update based on data inside the document at the time of the write using a transaction
-  // https://firebase.google.com/docs/firestore/manage-data/transactions#web-version-9
+                  // Transactionally update the collections within the overall promise so we dont 
+                  // get multiple updates at the same time overlapping
+                  await db.runTransaction(async (t): Promise<void> => {
+                        // Update the User Document
+                        await t.get(userRefSnap).then((snapshot) => {
+                          snapshot.docs.forEach(doc => {
+                            const resultSnapshot = doc.data().uniqueRecordingViewCount
+                            const updateUserDocument = db.collection("Users").doc(viewerId)
+                            updateUserDocument.update({ recordingsViewed: admin.firestore.FieldValue.arrayUnion(recordingId) })
+                            updateUserDocument.update({uniqueRecordingViewCount: resultSnapshot + 1})
+                          })
+                        })
+                        // Update the Record Document
+                        await t.get(recordingRefSnap).then((snapshot) => {
+                          snapshot.docs.forEach(doc => {
+                            const resultSnapshot = doc.data().uniqueViewCount
+                            const updateRecordingDocument = db.collection("Recordings").doc(recordingId)
+                            updateRecordingDocument.update({uniqueViewCount: resultSnapshot + 1})
+                          })
+                        })
 
-  await db.runTransaction(async (t): Promise<void> => {
-    const ref = db.collection("collection").doc("doc");
-    const docSnapshot = await t.get(ref);
-    // do something with the data
-    t.set(ref, {id: "id", field: "foobar"});
-  });
+                      })
+
+                } else {
+                  // When !=0 we have a record of this unique viewer and recording
+                  // Should likely have some sort of handling for NaN or undefined here as well that is more readable
+                  functions.logger.debug("This user has already viewed this recording!")
+                };
+            
+              });
+            } else {
+              // Could either try catch this or exit early gracefully here
+              // I chose the latter b/c as a user I dont love seeing the hard error
+              // thrown on the FE
+              functions.logger.debug("ERROR: Bad Inputs")
+            }
+          } catch (e) {
+            throw e;
+          }
 }

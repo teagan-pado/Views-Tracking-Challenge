@@ -5,6 +5,47 @@ If you WERE to implement tests for your function, what cases would you test?
 
 List each case below in plain english with it's expected result. 
 
-For example...
-Case: user a views user b's recording x for the first time
-Expected Result: etc etc
+Happy Path:
+Case: New User (who exists in the collection) views a new Recording (which exists in the collection) for the first time
+Expected Result: Expect all counters to increase from 0 -> 1 and a new recording is put into the user document
+
+Case: New User (who exists in the collection) views an already existing Recording for the first time
+Expected Result: Expect all counters to increase by 1, with the user getting a new recording view and the Recording adding to its total
+
+Case: Existing User views a new Recording (which exists in the collection) for the first time
+Expected Result: Expect all counters to increase by 1, with the Recording getting its first view and the User adding to its total
+
+Case: Existing User views an existing Recording
+Expected Result: Expect neither counter to increase and expect the recordingsViewed to not change for the User
+
+Case: Multiple Users send off the same input values at the same time
+Expected: The transactional writes allow us to only increase the counter once for the initial unique User/Recording pairing
+
+Case: Multiple Users send off multiple acceptable inputs at the same time
+Expected: All of the unique parings are handled correctly, updating all of the counters 
+
+Edge Cases:
+Case: New User (who does not exists in the collection) views a new Recording (which does not exists in the collection) for the first time
+Expected Result: Expect the user fail gracefully, no counters are changed and an error log is thrown for debugging
+
+Case: New User (who exists in the collection) views a new Recording (which does not exists in the collection) for the first time
+Expected Result: Expect the user fail gracefully, no counters are changed and an error log is thrown for debugging
+
+Case: New User (who does not exists in the collection) views a new Recording (which  exists in the collection) for the first time
+Expected Result: Expect the user fail gracefully, no counters are changed and an error log is thrown for debugging
+
+Case: New User (who does not exists in the collection) views an already existing Recording for the first time
+Expected Result: Expect the user fail gracefully, no counters are changed and an error log is thrown for debugging
+
+Case: Input empty User or Recording values
+Expected: We return out early and throw a 400 with some information
+
+Case: Input non-string values to either input
+Expected: Application will return early and throw 
+Actual: this passes at the moment 
+
+Case: Input space ' ' for an input to either value
+Expected: Application will return early and throw 
+Actual: this passes at the moment 
+
+Could probably go on to integration tests as well ...

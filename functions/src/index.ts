@@ -27,19 +27,20 @@ export const recordingViews = functions.https.onRequest(async (request, response
   if (request.method === "POST") {
     try {
       const {viewerId, recordingId} = request.body;
+      
+      // I wanted to validated on the type of the input, but if youre going through
+      // the FE it makes everything a string
+      // If we are using a different way to interact with the app we might want to add 
+      // other error handling i.e types, regex against special characters, etc
 
+      if (!viewerId.length || !recordingId.length) {
+        // Log for the console to debug
+          functions.logger.error("Please provide both inputs!");
+          response.status(400).send("Please provide both inputs!");
+          return;
+      }
 
-      /* BONUS OPPORTUNITY
-      Looks like you're a curious person. We like that.
-      Curiosity is one of our values.
-
-      For bonus points:
-        Show off your curiosity by adding some validation to this function.
-        1. Decide what should be validated, (don't worry about security / auth)
-        2. Validate it
-        3. Send a 400 response and return if the request is invalid
-            response.status(400).send();
-        */
+      // Warning this does not validate against space as an input
 
       await trackRecordingView(viewerId, recordingId);
       // it worked!
